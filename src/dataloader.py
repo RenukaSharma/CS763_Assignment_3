@@ -2,25 +2,49 @@ import numpy as np
 
 class dataloader():
 
-	def __init__(self, data, meta='', target='', type_='train'):
+	def __init__(self, train, test, labels, train_batch_size, test_batch_size):
 
-		self.type = type_
-		self.data = data
-		self.target = target
-		self.meta = meta
-		self.mean, self.stddev = np.load(self.meta)
+		self.train = train
+		self.test = test
+		self.labels = labels
 
-	def __getitem__(self, index):
+		self.r_s_t = np.arange(self.train.shape[0])
+		np.random.shuffle(self.r_s_t)
+		self.r_s_te = np.arange(self.test.shape[0])
+		np.random.shuffle(self.r_s_te)
+		
+		self.current_train = 0
+		self.current_test = 0
+		self.train_batch_size = train_batch_size
+		self.test_batch_size = test_batch_size
 
-		if index >= self.__len__()
+	def getitem_train(self, index):
+
+		if index >= self.len_train():
+			np.random.shuffle(self.r_s_t)
 			raise IndexError
 
-		data, target = self.load(index)
-		data = (data - self.mean)/self.stddev
+		index = self.r_s_t[index*self.train_batch_size:min((index+1)*self.train_batch_size, self.train.shape[0])]
+		data, target = self.train[self.r_s_t], self.labels[self.r_s_t]
 
 		return data, target
 
-	def __len__(self):
+	def getitem_test(self, index):
 
-		return len(self.paths)
+		if index >= self.len_train():
+			np.random.shuffle(self.r_s_t)
+			raise IndexError
+
+		index = self.r_s_te[index*self.test_batch_size:min((index+1)*self.test_batch_size, self.test.shape[0])]
+		data = self.test[self.r_s_t]
+
+		return data
+
+	def len_train(self):
+
+		return self.train.shape[0]
+
+	def len_test(self):
+
+		return self.test.shape[0]
 
